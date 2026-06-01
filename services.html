@@ -139,9 +139,55 @@
             </div>
           </div>
 
-          <!-- 4 · FORMAT + QUANTITÉ -->
+          <!-- 4 · TYPE DE REMISE -->
           <div class="opt-group">
-            <div class="glabel"><span class="step-no">04</span> Films &amp; coordonnées</div>
+            <div class="glabel"><span class="step-no">04</span> Type de remise</div>
+            <div class="opts">
+              <label class="opt">
+                <input type="radio" name="remise" value="En main propre" checked>
+                <span class="swatch sw-classic"></span>
+                <span class="t">En main propre</span>
+                <span class="d">On se voit pour la remise des négatifs.</span>
+                <span class="tick">✓</span><span class="pick-border"></span>
+              </label>
+              <label class="opt">
+                <input type="radio" name="remise" value="Envoi postal">
+                <span class="swatch sw-flat"></span>
+                <span class="t">Envoi postal</span>
+                <span class="d">Retour des négatifs par voie postale.</span>
+                <span class="tick">✓</span><span class="pick-border"></span>
+              </label>
+            </div>
+            <div class="return-notice" id="returnNotice" hidden>
+              <span class="rn-icon">📮</span>
+              <span>Prévoir une enveloppe + un timbre adapté pour le renvoi des négatifs.</span>
+            </div>
+          </div>
+
+          <!-- 5 · PAIEMENT -->
+          <div class="opt-group">
+            <div class="glabel"><span class="step-no">05</span> Paiement</div>
+            <div class="opts">
+              <label class="opt">
+                <input type="radio" name="paiement" value="En main propre" checked>
+                <span class="swatch sw-contrast"></span>
+                <span class="t">En main propre</span>
+                <span class="d">À régler au moment de la remise des pellicules.</span>
+                <span class="tick">✓</span><span class="pick-border"></span>
+              </label>
+              <label class="opt">
+                <input type="radio" name="paiement" value="Virement">
+                <span class="swatch sw-color"></span>
+                <span class="t">Virement</span>
+                <span class="d">Code de référence unique à indiquer dans la description du virement.</span>
+                <span class="tick">✓</span><span class="pick-border"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 6 · FORMAT + QUANTITÉ + COORDONNÉES -->
+          <div class="opt-group">
+            <div class="glabel"><span class="step-no">06</span> Films &amp; coordonnées</div>
             <div class="row2">
               <div class="field">
                 <label for="format">Format</label>
@@ -185,6 +231,8 @@
             <div class="recap-row"><span class="rk">Type</span><span class="rv" id="r-type">Noir &amp; Blanc</span></div>
             <div class="recap-row"><span class="rk">Rendu</span><span class="rv" id="r-rendu">Classique</span></div>
             <div class="recap-row"><span class="rk">Scan</span><span class="rv" id="r-scan">Avec scan HD</span></div>
+            <div class="recap-row"><span class="rk">Remise</span><span class="rv" id="r-remise">En main propre</span></div>
+            <div class="recap-row"><span class="rk">Paiement</span><span class="rv" id="r-paiement">En main propre</span></div>
             <div class="recap-row"><span class="rk">Format</span><span class="rv" id="r-format">35 mm</span></div>
             <div class="recap-row"><span class="rk">Quantité</span><span class="rv" id="r-qty">1 pellicule</span></div>
             <div class="recap-row"><span class="rk">Prix unitaire</span><span class="rv" id="r-unit">10 €</span></div>
@@ -198,7 +246,13 @@
             <p class="note">10 € la pellicule en 35 mm, 12 € en 120 — développement et scan inclus, peu importe le rendu choisi. Le devis est confirmé par email avant tout envoi de vos films.</p>
 
             <div class="sent" id="sentMsg">
-              ✅ Merci&nbsp;! Pour finaliser votre demande, écrivez-moi directement à <a href="mailto:buissonjarod@gmail.com" style="color:inherit;text-decoration:underline">buissonjarod@gmail.com</a> en collant ce récapitulatif.
+              <div class="sent-line">
+                ✅ Merci&nbsp;! Pour finaliser votre demande, écrivez-moi directement à <a href="mailto:buissonjarod@gmail.com" style="color:inherit;text-decoration:underline">buissonjarod@gmail.com</a> en collant ce récapitulatif.
+              </div>
+              <div class="virement-block" id="virementBlock" hidden>
+                <p class="vb-label">Référence à indiquer dans la description du virement</p>
+                <code class="virement-code" id="virementCode">JB-XXXXXX-XXXX</code>
+              </div>
             </div>
           </div>
         </aside>
