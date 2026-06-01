@@ -1,18 +1,24 @@
 /* Configurateur de la page Services.
-   Met à jour le récapitulatif et l'estimation tarifaire en direct.
-   Tarifs de maquette — purement indicatifs.
-   Prix unitaire = base(type) + rendu + scan, avec supplément format 120. */
+   Politique de tarif unique : 10 € par pellicule en 35 mm, 12 € en 120.
+   Dev + scan inclus dans le forfait. Les autres choix (type, rendu, scan)
+   sont des préférences pour le développement, sans incidence sur le prix. */
 (function () {
   var form = document.getElementById('configForm');
   if (!form) return;
 
-  var FORMAT_SURCHARGE = { '35mm': 0, '120': 3 }; // supplément moyen format / pellicule
+  var BASE_PRICE = 10;
+  var FORMAT_120_SURCHARGE = 2;
 
   var qtyInput = document.getElementById('qty');
   var formatSel = document.getElementById('format');
 
   function checked(name) {
     return form.querySelector('input[name="' + name + '"]:checked');
+  }
+
+  function set(id, val) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = val;
   }
 
   function update() {
@@ -22,15 +28,9 @@
     var format = formatSel.value;
     var qty    = Math.max(1, parseInt(qtyInput.value, 10) || 1);
 
-    var unit =
-      Number(type.dataset.price) +
-      Number(rendu.dataset.price) +
-      Number(scan.dataset.price) +
-      (FORMAT_SURCHARGE[format] || 0);
-
+    var unit  = BASE_PRICE + (format === '120' ? FORMAT_120_SURCHARGE : 0);
     var total = unit * qty;
 
-    // Récap texte
     set('r-type',   type.value);
     set('r-rendu',  rendu.value);
     set('r-scan',   scan.value);
@@ -38,16 +38,8 @@
     set('r-qty',    qty + (qty > 1 ? ' pellicules' : ' pellicule'));
     set('r-unit',   unit + ' €');
     set('r-total',  total + ' €');
-
-    // état visuel des cartes (la bordure colorée est gérée en CSS via :checked)
   }
 
-  function set(id, val) {
-    var el = document.getElementById(id);
-    if (el) el.textContent = val;
-  }
-
-  // Stepper quantité
   document.getElementById('plus').addEventListener('click', function () {
     qtyInput.value = Math.min(99, (parseInt(qtyInput.value, 10) || 1) + 1);
     update();
@@ -57,10 +49,8 @@
     update();
   });
 
-  // Réagit à tout changement d'option
   form.addEventListener('change', update);
 
-  // Soumission (maquette : pas d'envoi réel)
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     var msg = document.getElementById('sentMsg');
