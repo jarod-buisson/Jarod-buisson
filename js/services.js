@@ -3,23 +3,30 @@
    Dev + scan inclus dans le forfait. Type/rendu/scan/remise/paiement sont
    des préférences sans incidence sur le prix.
 
-   Submit :
-   - Affiche le récap de confirmation.
-   - Si paiement = Virement : génère une référence unique « JB-YYMMDD-XXXX »
-     à reporter dans la description du virement (pour rattacher l'arrivée
-     du paiement à la commande). */
+   Envoi : AJAX POST vers FormSubmit (endpoint configuré dans le form HTML).
+   - Si paiement = Virement : génère une référence unique JB-YYMMDD-XXXX,
+     l'inclut dans le mail envoyé et l'affiche au client après succès.
+   - Si l'envoi échoue (réseau, FormSubmit down…) on affiche un fallback
+     qui invite le client à m'écrire directement. */
 (function () {
   var form = document.getElementById('configForm');
   if (!form) return;
 
   var BASE_PRICE = 10;
   var FORMAT_120_SURCHARGE = 2;
+  var FORMAT_120_VALUE = '120 (moyen format)';
 
   var qtyInput      = document.getElementById('qty');
   var formatSel     = document.getElementById('format');
   var returnNotice  = document.getElementById('returnNotice');
   var virementBlock = document.getElementById('virementBlock');
   var virementCode  = document.getElementById('virementCode');
+  var sentMsg       = document.getElementById('sentMsg');
+  var errMsg        = document.getElementById('errMsg');
+  var submitBtn     = document.getElementById('submitBtn');
+  var hPrixUnit     = document.getElementById('hPrixUnit');
+  var hTotal        = document.getElementById('hTotal');
+  var hRef          = document.getElementById('hRef');
 
   function checked(name) {
     return form.querySelector('input[name="' + name + '"]:checked');
@@ -39,7 +46,7 @@
     var format   = formatSel.value;
     var qty      = Math.max(1, parseInt(qtyInput.value, 10) || 1);
 
-    var unit  = BASE_PRICE + (format === '120' ? FORMAT_120_SURCHARGE : 0);
+    var unit  = BASE_PRICE + (format === FORMAT_120_VALUE ? FORMAT_120_SURCHARGE : 0);
     var total = unit * qty;
 
     set('r-type',     type.value);
@@ -47,7 +54,7 @@
     set('r-scan',     scan.value);
     set('r-remise',   remise.value);
     set('r-paiement', paiement.value);
-    set('r-format',   format === '120' ? '120 (moyen format)' : '35 mm');
+    set('r-format',   format);
     set('r-qty',      qty + (qty > 1 ? ' pellicules' : ' pellicule'));
     set('r-unit',     unit + ' €');
     set('r-total',    total + ' €');
@@ -83,21 +90,55 @@
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
-    var msg = document.getElementById('sentMsg');
-    if (!msg) return;
+    if (!sentMsg) return;
 
+    // Reset des deux messages avant un nouvel envoi
+    sentMsg.classList.remove('show');
+    if (errMsg) errMsg.classList.remove('show');
+
+    // Génération du code virement si applicable, et préparation de l'affichage
     var paiement = checked('paiement');
-    if (virementBlock && virementCode) {
-      if (paiement.value === 'Virement') {
-        virementCode.textContent = generateRef();
-        virementBlock.hidden = false;
-      } else {
-        virementBlock.hidden = true;
-      }
+    var isVirement = paiement.value === 'Virement';
+    var ref = '';
+    if (isVirement) {
+      ref = generateRef();
+      if (virementCode) virementCode.textContent = ref;
     }
+    if (virementBlock) virementBlock.hidden = !isVirement;
 
-    msg.classList.add('show');
-    msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // Remplissage des hidden fields envoyés à FormSubmit pour qu'ils figurent
+    // dans le mail (sinon Jarod ne verrait que les inputs visibles)
+    if (hPrixUnit) hPrixUnit.value = document.getElementById('r-unit').textContent;
+    if (hTotal)    hTotal.value    = document.getElementById('r-total').textContent;
+    if (hRef)      hRef.value      = isVirement ? ref : '(paiement en main propre)';
+
+    var origLabel = submitBtn ? submitBtn.textContent : '';
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Envoi…'; }
+
+    fetch(form.action, {
+      method: 'POST',
+      body: new FormData(form),
+      headers: { 'Accept': 'application/json' }
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (json) {
+      var ok = json.success === 'true' || json.success === true;
+      if (!ok) throw new Error(json.message || 'submission failed');
+      sentMsg.classList.add('show');
+      sentMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    })
+    .catch(function () {
+      if (errMsg) {
+        errMsg.classList.add('show');
+        errMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    })
+    .finally(function () {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = origLabel || 'Envoyer ma demande →';
+      }
+    });
   });
 
   update();

@@ -65,7 +65,19 @@
   <!-- ============================ CONFIGURATEUR ============================ -->
   <section class="section">
     <div class="wrap">
-      <form class="config" id="configForm">
+      <form class="config" id="configForm"
+            action="https://formsubmit.co/ajax/buissonjarod@gmail.com"
+            method="POST">
+
+        <!-- Config FormSubmit (cachés, non visibles à l'écran) -->
+        <input type="hidden" name="_subject" value="Nouvelle demande de devis — Jarod Buisson">
+        <input type="hidden" name="_template" value="table">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:0;height:0;opacity:0">
+        <!-- Champs calculés (remplis par services.js au moment du submit) -->
+        <input type="hidden" name="prix_unitaire" id="hPrixUnit">
+        <input type="hidden" name="total" id="hTotal">
+        <input type="hidden" name="reference_virement" id="hRef">
 
         <!-- Colonne choix -->
         <div>
@@ -192,8 +204,8 @@
               <div class="field">
                 <label for="format">Format</label>
                 <select id="format" name="format">
-                  <option value="35mm">35 mm</option>
-                  <option value="120">120 (moyen format)</option>
+                  <option value="35 mm">35 mm</option>
+                  <option value="120 (moyen format)">120 (moyen format)</option>
                 </select>
               </div>
               <div class="field">
@@ -242,17 +254,21 @@
               <span class="tv" id="r-total">10 €</span>
             </div>
 
-            <button type="submit" class="btn">Envoyer ma demande →</button>
+            <button type="submit" class="btn" id="submitBtn">Envoyer ma demande →</button>
             <p class="note">10 € la pellicule en 35 mm, 12 € en 120 — développement et scan inclus, peu importe le rendu choisi. Le devis est confirmé par email avant tout envoi de vos films.</p>
 
             <div class="sent" id="sentMsg">
               <div class="sent-line">
-                ✅ Merci&nbsp;! Pour finaliser votre demande, écrivez-moi directement à <a href="mailto:buissonjarod@gmail.com" style="color:inherit;text-decoration:underline">buissonjarod@gmail.com</a> en collant ce récapitulatif.
+                ✅ Demande envoyée&nbsp;! Je vous réponds par email sous 24 à 48&nbsp;h.
               </div>
               <div class="virement-block" id="virementBlock" hidden>
                 <p class="vb-label">Référence à indiquer dans la description du virement</p>
                 <code class="virement-code" id="virementCode">JB-XXXXXX-XXXX</code>
               </div>
+            </div>
+
+            <div class="sent err" id="errMsg">
+              ⚠️ L'envoi a échoué. Écrivez-moi directement à <a href="mailto:buissonjarod@gmail.com" style="color:inherit;text-decoration:underline">buissonjarod@gmail.com</a> en collant ce récapitulatif.
             </div>
           </div>
         </aside>

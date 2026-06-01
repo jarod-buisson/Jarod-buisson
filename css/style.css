@@ -453,13 +453,18 @@ section { position: relative; }
 .howto { display: grid; grid-template-columns: repeat(4,1fr); gap: 22px; margin-top: 10px; }
 .howto .step .k { color: var(--safelight); }
 
-/* message d'envoi */
+/* message d'envoi (succès par défaut, .err pour fallback en cas d'échec) */
 .sent {
   margin-top: 22px; padding: 16px 18px; border-radius: var(--r-s);
   background: rgba(110,143,106,.12); border: 1px solid var(--green);
   color: #c4d6bf; font-size: 14px; display: none;
 }
 .sent.show { display: block; }
+.sent.err {
+  background: rgba(214,105,74,.12);
+  border-color: var(--safelight);
+  color: #f4d1c5;
+}
 
 /* encart conditionnel sous l'option Envoi postal */
 .return-notice {
