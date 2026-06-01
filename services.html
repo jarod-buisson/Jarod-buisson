@@ -52,7 +52,7 @@
   <section class="section" style="padding-top:30px">
     <div class="wrap">
       <div class="howto">
-        <div class="step"><p class="k">ÉTAPE 1</p><h3>Vous configurez</h3><p>Type de film, rendu, et option scan.</p></div>
+        <div class="step"><p class="k">ÉTAPE 1</p><h3>Vous configurez</h3><p>Format, type de film, rendu, et option scan.</p></div>
         <div class="step"><p class="k">ÉTAPE 2</p><h3>Vous m'écrivez</h3><p>Coordonnées + détails de vos films.</p></div>
         <div class="step"><p class="k">ÉTAPE 3</p><h3>Vous envoyez</h3><p>Je vous donne l'adresse postale.</p></div>
         <div class="step"><p class="k">ÉTAPE 4</p><h3>Vous recevez</h3><p>Négatifs + scans selon l'option.</p></div>
@@ -81,9 +81,34 @@
 
         <!-- Colonne choix -->
         <div>
-          <!-- 1 · TYPE -->
+          <!-- 1 · FORMAT + QUANTITÉ -->
           <div class="opt-group">
-            <div class="glabel"><span class="step-no">01</span> Type de pellicule</div>
+            <div class="glabel"><span class="step-no">01</span> Format &amp; quantité</div>
+            <div class="row2">
+              <div class="field">
+                <label for="format">Format</label>
+                <select id="format" name="format">
+                  <option value="35 mm">35 mm</option>
+                  <option value="120 (moyen format)">120 (moyen format)</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="qty">Nombre de pellicules</label>
+                <div class="stepper">
+                  <button type="button" id="minus" aria-label="moins">−</button>
+                  <input type="number" id="qty" name="qty" value="1" min="1" max="99" readonly>
+                  <button type="button" id="plus" aria-label="plus">+</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2 · TYPE DE PELLICULE -->
+          <div class="opt-group">
+            <div class="glabel"><span class="step-no">02</span> Type de pellicule</div>
+            <div class="glabel-hint" id="typeHint" hidden>
+              Plusieurs pellicules&nbsp;: cochez chaque type que vous avez. La répartition exacte (combien de N&amp;B, combien de Couleur, sensibilités…) se précise dans la zone <em>Détails</em> plus bas.
+            </div>
             <div class="opts">
               <label class="opt">
                 <input type="radio" name="type" value="N&B" checked>
@@ -102,9 +127,9 @@
             </div>
           </div>
 
-          <!-- 2 · RENDU -->
+          <!-- 3 · RENDU -->
           <div class="opt-group">
-            <div class="glabel"><span class="step-no">02</span> Rendu d'étalonnage</div>
+            <div class="glabel"><span class="step-no">03</span> Rendu d'étalonnage</div>
             <div class="opts three">
               <label class="opt">
                 <input type="radio" name="rendu" value="Classique" checked>
@@ -130,9 +155,9 @@
             </div>
           </div>
 
-          <!-- 3 · SCAN -->
+          <!-- 4 · SCAN -->
           <div class="opt-group">
-            <div class="glabel"><span class="step-no">03</span> Numérisation</div>
+            <div class="glabel"><span class="step-no">04</span> Numérisation</div>
             <div class="opts">
               <label class="opt">
                 <input type="radio" name="scan" value="Avec scan HD" checked>
@@ -151,9 +176,9 @@
             </div>
           </div>
 
-          <!-- 4 · TYPE DE REMISE -->
+          <!-- 5 · TYPE DE REMISE -->
           <div class="opt-group">
-            <div class="glabel"><span class="step-no">04</span> Type de remise</div>
+            <div class="glabel"><span class="step-no">05</span> Type de remise</div>
             <div class="opts">
               <label class="opt">
                 <input type="radio" name="remise" value="En main propre" checked>
@@ -176,9 +201,9 @@
             </div>
           </div>
 
-          <!-- 5 · PAIEMENT -->
+          <!-- 6 · PAIEMENT -->
           <div class="opt-group">
-            <div class="glabel"><span class="step-no">05</span> Paiement</div>
+            <div class="glabel"><span class="step-no">06</span> Paiement</div>
             <div class="opts">
               <label class="opt">
                 <input type="radio" name="paiement" value="En main propre" checked>
@@ -197,26 +222,9 @@
             </div>
           </div>
 
-          <!-- 6 · FORMAT + QUANTITÉ + COORDONNÉES -->
+          <!-- 7 · COORDONNÉES -->
           <div class="opt-group">
-            <div class="glabel"><span class="step-no">06</span> Films &amp; coordonnées</div>
-            <div class="row2">
-              <div class="field">
-                <label for="format">Format</label>
-                <select id="format" name="format">
-                  <option value="35 mm">35 mm</option>
-                  <option value="120 (moyen format)">120 (moyen format)</option>
-                </select>
-              </div>
-              <div class="field">
-                <label for="qty">Nombre de pellicules</label>
-                <div class="stepper">
-                  <button type="button" id="minus" aria-label="moins">−</button>
-                  <input type="number" id="qty" name="qty" value="1" min="1" max="99" readonly>
-                  <button type="button" id="plus" aria-label="plus">+</button>
-                </div>
-              </div>
-            </div>
+            <div class="glabel"><span class="step-no">07</span> Coordonnées</div>
             <div class="row2">
               <div class="field">
                 <label for="name">Nom</label>
@@ -240,13 +248,13 @@
             <h3>Votre commande</h3>
             <p class="sub">Tarif fixe · devis sans engagement</p>
 
+            <div class="recap-row"><span class="rk">Format</span><span class="rv" id="r-format">35 mm</span></div>
+            <div class="recap-row"><span class="rk">Quantité</span><span class="rv" id="r-qty">1 pellicule</span></div>
             <div class="recap-row"><span class="rk">Type</span><span class="rv" id="r-type">Noir &amp; Blanc</span></div>
             <div class="recap-row"><span class="rk">Rendu</span><span class="rv" id="r-rendu">Classique</span></div>
             <div class="recap-row"><span class="rk">Scan</span><span class="rv" id="r-scan">Avec scan HD</span></div>
             <div class="recap-row"><span class="rk">Remise</span><span class="rv" id="r-remise">En main propre</span></div>
             <div class="recap-row"><span class="rk">Paiement</span><span class="rv" id="r-paiement">En main propre</span></div>
-            <div class="recap-row"><span class="rk">Format</span><span class="rv" id="r-format">35 mm</span></div>
-            <div class="recap-row"><span class="rk">Quantité</span><span class="rv" id="r-qty">1 pellicule</span></div>
             <div class="recap-row"><span class="rk">Prix unitaire</span><span class="rv" id="r-unit">10 €</span></div>
 
             <div class="recap-total">

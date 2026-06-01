@@ -372,6 +372,15 @@ section { position: relative; }
   font-family: var(--serif); font-size: 30px; color: var(--safelight);
   letter-spacing: 0; line-height: 1;
 }
+.glabel-hint {
+  margin: -8px 0 18px;
+  padding: 12px 14px;
+  background: rgba(110,143,106,.08);
+  border: 1px solid rgba(110,143,106,.3);
+  border-radius: var(--r-s);
+  font-size: 13.5px; color: var(--ink-soft); line-height: 1.55;
+}
+.glabel-hint em { color: var(--amber); font-style: normal; }
 .opts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
 .opts.three { grid-template-columns: repeat(3, 1fr); }
 
