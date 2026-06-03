@@ -567,6 +567,8 @@ section { position: relative; }
   font-size: 13.5px; color: var(--ink-soft); line-height: 1.5;
 }
 .return-notice .rn-icon { font-size: 18px; line-height: 1; flex-shrink: 0; }
+/* l'attribut [hidden] doit l'emporter sur le display:flex ci-dessus */
+.return-notice[hidden] { display: none; }
 
 /* bloc affiché dans le message de succès quand paiement = Virement */
 .virement-block {
@@ -588,6 +590,33 @@ section { position: relative; }
   background: rgba(0,0,0,.22);
   padding: 6px 10px; border-radius: 6px;
 }
+
+/* étape 05 : paiement par virement (PayPal / Wero), option unique */
+.pay-panel {
+  background: var(--bg-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 22px 22px 20px;
+}
+.pay-intro { margin: 0 0 16px; font-size: 14.5px; color: var(--ink-soft); line-height: 1.55; }
+.pay-intro b { color: var(--ink); font-weight: 600; }
+.pay-ref {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 16px 18px;
+  background: rgba(214,105,74,.08);
+  border: 1px solid var(--safelight);
+  border-radius: var(--r-s);
+}
+.pay-ref .pr-label {
+  font-family: var(--mono); font-size: 11.5px;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft);
+}
+.pay-ref .pr-code {
+  font-family: var(--mono); font-size: 26px; font-weight: 500;
+  letter-spacing: .24em; color: var(--amber);
+  user-select: all; line-height: 1.1;
+}
+.pay-note { margin: 14px 0 0; font-size: 12.5px; color: var(--muted); line-height: 1.5; }
 
 /* =========================================================================
    Responsive

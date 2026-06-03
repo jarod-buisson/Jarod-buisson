@@ -7,16 +7,18 @@
    Tarification :
    - 35 mm : 10 € par pellicule (N&B ou Couleur)
    - 120   : 12 € par pellicule (N&B ou Couleur)
-   Le rendu, le scan, la remise et le paiement n'ont pas d'incidence sur
-   le prix — ce sont des préférences de traitement.
+   Le rendu, le scan et la remise n'ont pas d'incidence sur le prix —
+   ce sont des préférences de traitement.
+
+   Paiement : exclusivement par virement (PayPal ou Wero). Une référence
+   à 6 caractères est générée à chaque chargement de la page ; le client
+   doit la reporter dans la description de son virement pour qu'on puisse
+   rattacher le paiement à sa commande.
 
    Envoi : AJAX POST vers FormSubmit. On construit FormData manuellement
    pour que le mail soit lisible (composition agrégée, totaux nommés)
-   plutôt qu'une liste des 4 compteurs bruts.
-
-   - Si paiement = Virement : on génère une référence unique JB-YYMMDD-XXXX
-     qu'on inclut dans le mail et qu'on affiche au client après envoi.
-   - Si l'envoi échoue : message fallback qui invite à m'écrire en direct. */
+   plutôt qu'une liste des 4 compteurs bruts. Si l'envoi échoue, message
+   fallback qui invite à m'écrire en direct. */
 (function () {
   var form = document.getElementById('configForm');
   if (!form) return;
@@ -42,14 +44,26 @@
   ];
 
   var returnNotice  = document.getElementById('returnNotice');
-  var virementBlock = document.getElementById('virementBlock');
   var virementCode  = document.getElementById('virementCode');
+  var payCode       = document.getElementById('payCode');
   var emptyHint     = document.getElementById('emptyHint');
   var sentMsg       = document.getElementById('sentMsg');
   var errMsg        = document.getElementById('errMsg');
   var submitBtn     = document.getElementById('submitBtn');
   var rPellicules   = document.getElementById('r-pellicules');
   var renduPreview  = document.getElementById('renduPreview');
+
+  // Référence de paiement : 6 caractères aléatoires sans ambiguïté visuelle
+  // (exclus 0/O et 1/I/L). Régénérée à chaque chargement de page.
+  function generateRef() {
+    var chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+    var s = '';
+    for (var i = 0; i < 6; i++) {
+      s += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return s;
+  }
+  var PAY_REF = generateRef();
 
   function checked(name) {
     return form.querySelector('input[name="' + name + '"]:checked');
@@ -97,7 +111,6 @@
     var rendu    = checked('rendu');
     var scan     = checked('scan');
     var remise   = checked('remise');
-    var paiement = checked('paiement');
 
     // Pellicules : liste multi-ligne dans le récap, ou "—" si vide
     if (rPellicules) {
@@ -118,7 +131,7 @@
     set('r-rendu',    rendu ? rendu.value : '—');
     set('r-scan',     scan ? scan.value : '—');
     set('r-remise',   remise ? remise.value : '—');
-    set('r-paiement', paiement ? paiement.value : '—');
+    set('r-paiement', 'Virement · réf. ' + PAY_REF);
     set('r-qty',      t.qty + (t.qty > 1 ? ' pellicules' : ' pellicule'));
     set('r-total',    t.price + ' €');
 
@@ -131,6 +144,7 @@
       }
     }
 
+    // Encart « enveloppe + timbre » uniquement en cas d'envoi postal
     if (returnNotice) returnNotice.hidden = !remise || remise.value !== 'Envoi postal';
 
     // Empêche l'envoi si aucune pellicule sélectionnée
@@ -146,21 +160,6 @@
     return items.map(function (it) {
       return it.n + '× ' + it.type + ' ' + it.format;
     }).join(' + ');
-  }
-
-  // Référence virement type "JB-260601-X7K9".
-  // Caractères sans ambiguïté visuelle : exclus 0/O, 1/I/L.
-  function generateRef() {
-    var chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
-    var rand = '';
-    for (var i = 0; i < 4; i++) {
-      rand += chars[Math.floor(Math.random() * chars.length)];
-    }
-    var d = new Date();
-    var yy = String(d.getFullYear()).slice(-2);
-    var mm = String(d.getMonth() + 1).padStart(2, '0');
-    var dd = String(d.getDate()).padStart(2, '0');
-    return 'JB-' + yy + mm + dd + '-' + rand;
   }
 
   // Délégation : tous les boutons +/- des 4 mini-steppers passent par là
@@ -186,15 +185,6 @@
     var t = totals();
     if (t.qty === 0) return; // garde-fou, normalement le bouton est disabled
 
-    var paiement = checked('paiement');
-    var isVirement = paiement && paiement.value === 'Virement';
-    var ref = '';
-    if (isVirement) {
-      ref = generateRef();
-      if (virementCode) virementCode.textContent = ref;
-    }
-    if (virementBlock) virementBlock.hidden = !isVirement;
-
     // Construction manuelle du FormData : on n'envoie pas les 4 compteurs
     // bruts (qty_nb_35, etc.) qui seraient peu lisibles dans le mail, mais
     // une composition agrégée et les totaux nommés
@@ -205,17 +195,17 @@
     var honey = form.querySelector('input[name="_honey"]');
     if (honey) fd.append('_honey', honey.value);
 
-    fd.append('composition',        compositionString());
-    fd.append('quantite_totale',    String(t.qty));
-    fd.append('prix_total',         t.price + ' €');
-    fd.append('rendu',              checked('rendu').value);
-    fd.append('scan',               checked('scan').value);
-    fd.append('remise',             checked('remise').value);
-    fd.append('paiement',           paiement.value);
-    fd.append('reference_virement', isVirement ? ref : '(paiement en main propre)');
-    fd.append('nom',                document.getElementById('name').value);
-    fd.append('email',              document.getElementById('email').value);
-    fd.append('details',            document.getElementById('msg').value);
+    fd.append('composition',         compositionString());
+    fd.append('quantite_totale',     String(t.qty));
+    fd.append('prix_total',          t.price + ' €');
+    fd.append('rendu',               checked('rendu').value);
+    fd.append('scan',                checked('scan').value);
+    fd.append('remise',              checked('remise').value);
+    fd.append('paiement',            'Virement (PayPal ou Wero)');
+    fd.append('reference_paiement',  PAY_REF);
+    fd.append('nom',                 document.getElementById('name').value);
+    fd.append('email',               document.getElementById('email').value);
+    fd.append('details',             document.getElementById('msg').value);
 
     var origLabel = submitBtn ? submitBtn.textContent : '';
     if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Envoi…'; }
@@ -245,6 +235,10 @@
       }
     });
   });
+
+  // Init : affiche la référence de paiement partout où elle apparaît
+  if (payCode) payCode.textContent = PAY_REF;
+  if (virementCode) virementCode.textContent = PAY_REF;
 
   update();
 })();
