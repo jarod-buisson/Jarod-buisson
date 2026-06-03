@@ -25,6 +25,14 @@
   var PRICE_120  = 12;
   var FORMSUBMIT_ENDPOINT = form.action;
 
+  // Aperçu photo par rendu. Noms de fichiers en ASCII minuscule : GitHub
+  // Pages tourne sous Linux (sensible à la casse) et n'aime pas les accents.
+  var RENDU_PREVIEW = {
+    'Classique': 'images/classique.jpg',
+    'Contrasté': 'images/contraste.jpg',
+    'Flat':      'images/flat.jpg'
+  };
+
   // 4 compteurs (type × format) + leurs métadonnées pour la composition lisible
   var COUNTERS = [
     { id: 'qty_nb_35',  type: 'N&B',     format: '35 mm', price: PRICE_35  },
@@ -41,6 +49,7 @@
   var errMsg        = document.getElementById('errMsg');
   var submitBtn     = document.getElementById('submitBtn');
   var rPellicules   = document.getElementById('r-pellicules');
+  var renduPreview  = document.getElementById('renduPreview');
 
   function checked(name) {
     return form.querySelector('input[name="' + name + '"]:checked');
@@ -112,6 +121,15 @@
     set('r-paiement', paiement ? paiement.value : '—');
     set('r-qty',      t.qty + (t.qty > 1 ? ' pellicules' : ' pellicule'));
     set('r-total',    t.price + ' €');
+
+    // Bascule l'aperçu photo selon le rendu sélectionné
+    if (renduPreview && rendu) {
+      var previewSrc = RENDU_PREVIEW[rendu.value];
+      if (previewSrc && renduPreview.getAttribute('src') !== previewSrc) {
+        renduPreview.src = previewSrc;
+        renduPreview.alt = 'Aperçu du rendu ' + rendu.value;
+      }
+    }
 
     if (returnNotice) returnNotice.hidden = !remise || remise.value !== 'Envoi postal';
 
