@@ -128,6 +128,10 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 500; line-height: 1.08; mar
   transition: transform .2s ease, background .2s, box-shadow .2s;
 }
 .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(214,105,74,.28); }
+.btn:disabled, .btn[disabled] {
+  opacity: .45; cursor: not-allowed;
+  transform: none; box-shadow: none;
+}
 .btn.ghost {
   background: transparent; color: var(--ink);
   border-color: var(--line);
@@ -441,6 +445,58 @@ section { position: relative; }
 .stepper input { width: 64px; text-align: center; border: 0; background: none; color: var(--ink); font-family: var(--mono); font-size: 17px; }
 .stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 
+/* variante compacte utilisée dans les cartes pellicules */
+.stepper.stepper-sm button { width: 36px; height: 38px; font-size: 18px; }
+.stepper.stepper-sm input { width: 42px; font-size: 15px; }
+
+/* étape 01 : cartes de pellicules avec mini-steppers intégrés ---------- */
+.pellicules {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+.pellicule-card {
+  display: flex; flex-direction: column;
+  background: var(--bg-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 22px 22px 18px;
+  transition: border-color .2s;
+}
+.pellicule-card:hover { border-color: #5a4f44; }
+.pellicule-card .swatch {
+  width: 100%; height: 64px; border-radius: var(--r-s);
+  margin-bottom: 16px; border: 1px solid rgba(255,255,255,.06);
+}
+.pellicule-card .pc-title {
+  font-family: var(--serif); font-size: 20px; font-weight: 500;
+  margin: 0 0 5px;
+}
+.pellicule-card .pc-desc {
+  font-size: 13.5px; color: var(--muted);
+  margin: 0 0 16px; line-height: 1.4;
+}
+.pc-formats {
+  display: flex; flex-direction: column; gap: 10px;
+  margin-top: auto;
+  border-top: 1px dashed var(--line);
+  padding-top: 14px;
+}
+.pc-format-row {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 14px;
+}
+.pc-format-row .pc-fmt {
+  font-family: var(--mono); font-size: 13px;
+  color: var(--ink-soft); letter-spacing: .04em;
+}
+
+.empty-hint {
+  margin: 18px 0 0;
+  font-family: var(--mono); font-size: 12.5px;
+  color: var(--safelight); letter-spacing: .04em;
+}
+
 /* récap collant */
 .recap {
   position: sticky; top: 100px;
@@ -452,6 +508,9 @@ section { position: relative; }
 .recap-row { display: flex; justify-content: space-between; gap: 14px; padding: 13px 0; border-bottom: 1px dashed var(--line); font-size: 14.5px; }
 .recap-row .rk { color: var(--muted); }
 .recap-row .rv { color: var(--ink); text-align: right; font-weight: 500; }
+/* variante : valeur sur plusieurs lignes (composition pellicules) */
+.recap-row.recap-row-stack { align-items: flex-start; }
+.recap-row.recap-row-stack .rv { display: flex; flex-direction: column; gap: 4px; }
 .recap-total { display: flex; justify-content: space-between; align-items: baseline; margin: 24px 0; }
 .recap-total .tk { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
 .recap-total .tv { font-family: var(--serif); font-size: 42px; color: var(--amber); }
@@ -518,6 +577,7 @@ section { position: relative; }
   .footer-grid { grid-template-columns: 1fr; gap: 30px; }
   .gallery > * { grid-column: span 12 !important; }
   .opts.three { grid-template-columns: 1fr; }
+  .pellicules { grid-template-columns: 1fr; }
   .recap { position: static; }
   .serie { grid-template-columns: 40px 1fr auto; gap: 16px; }
 }

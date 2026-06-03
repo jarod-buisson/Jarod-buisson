@@ -1,47 +1,49 @@
 /* Configurateur de la page Services.
-   Politique de tarif unique : 10 € par pellicule en 35 mm, 12 € en 120.
-   Dev + scan inclus dans le forfait. Type/rendu/scan/remise/paiement sont
-   des préférences sans incidence sur le prix.
 
-   Type multi-sélection : si l'utilisateur commande plusieurs pellicules,
-   les radios "type" passent en checkboxes (il peut avoir un mix N&B + Couleur).
-   Au moins un type doit rester coché en permanence.
+   Modèle « panier » : l'utilisateur compose sa commande en incrémentant
+   les compteurs des cartes Noir & Blanc et Couleur, chacune offrant deux
+   formats (35 mm et 120). Le total quantité + prix se calculent en direct.
 
-   Envoi : AJAX POST vers FormSubmit (endpoint configuré dans le form HTML).
-   - Si paiement = Virement : génère une référence unique JB-YYMMDD-XXXX,
-     l'inclut dans le mail envoyé et l'affiche au client après succès.
-   - Si l'envoi échoue (réseau, FormSubmit down…) on affiche un fallback
-     qui invite le client à m'écrire directement. */
+   Tarification :
+   - 35 mm : 10 € par pellicule (N&B ou Couleur)
+   - 120   : 12 € par pellicule (N&B ou Couleur)
+   Le rendu, le scan, la remise et le paiement n'ont pas d'incidence sur
+   le prix — ce sont des préférences de traitement.
+
+   Envoi : AJAX POST vers FormSubmit. On construit FormData manuellement
+   pour que le mail soit lisible (composition agrégée, totaux nommés)
+   plutôt qu'une liste des 4 compteurs bruts.
+
+   - Si paiement = Virement : on génère une référence unique JB-YYMMDD-XXXX
+     qu'on inclut dans le mail et qu'on affiche au client après envoi.
+   - Si l'envoi échoue : message fallback qui invite à m'écrire en direct. */
 (function () {
   var form = document.getElementById('configForm');
   if (!form) return;
 
-  var BASE_PRICE = 10;
-  var FORMAT_120_SURCHARGE = 2;
-  var FORMAT_120_VALUE = '120 (moyen format)';
+  var PRICE_35   = 10;
+  var PRICE_120  = 12;
+  var FORMSUBMIT_ENDPOINT = form.action;
 
-  var qtyInput      = document.getElementById('qty');
-  var formatSel     = document.getElementById('format');
+  // 4 compteurs (type × format) + leurs métadonnées pour la composition lisible
+  var COUNTERS = [
+    { id: 'qty_nb_35',  type: 'N&B',     format: '35 mm', price: PRICE_35  },
+    { id: 'qty_nb_120', type: 'N&B',     format: '120',   price: PRICE_120 },
+    { id: 'qty_col_35', type: 'Couleur', format: '35 mm', price: PRICE_35  },
+    { id: 'qty_col_120',type: 'Couleur', format: '120',   price: PRICE_120 }
+  ];
+
   var returnNotice  = document.getElementById('returnNotice');
   var virementBlock = document.getElementById('virementBlock');
   var virementCode  = document.getElementById('virementCode');
-  var typeHint      = document.getElementById('typeHint');
+  var emptyHint     = document.getElementById('emptyHint');
   var sentMsg       = document.getElementById('sentMsg');
   var errMsg        = document.getElementById('errMsg');
   var submitBtn     = document.getElementById('submitBtn');
-  var hPrixUnit     = document.getElementById('hPrixUnit');
-  var hTotal        = document.getElementById('hTotal');
-  var hRef          = document.getElementById('hRef');
+  var rPellicules   = document.getElementById('r-pellicules');
 
   function checked(name) {
     return form.querySelector('input[name="' + name + '"]:checked');
-  }
-
-  function checkedValues(name) {
-    var inputs = form.querySelectorAll('input[name="' + name + '"]:checked');
-    var values = [];
-    inputs.forEach(function (i) { values.push(i.value); });
-    return values;
   }
 
   function set(id, val) {
@@ -49,62 +51,83 @@
     if (el) el.textContent = val;
   }
 
-  function getQty() {
-    return Math.max(1, parseInt(qtyInput.value, 10) || 1);
+  function getCount(id) {
+    var el = document.getElementById(id);
+    return Math.max(0, parseInt(el ? el.value : 0, 10) || 0);
   }
 
-  // Bascule les inputs "type" entre radio (qty=1) et checkbox (qty>1),
-  // préserve l'état coché, et garantit qu'au moins un reste coché.
-  function syncTypeMode() {
-    var multi = getQty() > 1;
-    var inputs = form.querySelectorAll('input[name="type"]');
-    var newType = multi ? 'checkbox' : 'radio';
+  function setCount(id, n) {
+    var el = document.getElementById(id);
+    if (el) el.value = Math.min(99, Math.max(0, n));
+  }
 
-    var was = [];
-    inputs.forEach(function (i) { if (i.checked) was.push(i.value); });
-
-    inputs.forEach(function (i) { i.type = newType; });
-
-    // Restaure l'état coché. Si on repasse en radio avec plusieurs cochés
-    // avant, on ne garde que le premier de la liste cochée.
-    inputs.forEach(function (i) {
-      if (!multi) {
-        i.checked = was.length > 0 && i.value === was[0];
-      } else {
-        i.checked = was.indexOf(i.value) !== -1;
-      }
+  // Items non nuls sous forme exploitable pour le récap et le mail
+  function composition() {
+    var items = [];
+    COUNTERS.forEach(function (c) {
+      var n = getCount(c.id);
+      if (n > 0) items.push({ n: n, type: c.type, format: c.format, price: c.price });
     });
+    return items;
+  }
 
-    if (form.querySelectorAll('input[name="type"]:checked').length === 0) {
-      inputs[0].checked = true;
-    }
-
-    if (typeHint) typeHint.hidden = !multi;
+  function totals() {
+    var qty = 0;
+    var price = 0;
+    COUNTERS.forEach(function (c) {
+      var n = getCount(c.id);
+      qty += n;
+      price += n * c.price;
+    });
+    return { qty: qty, price: price };
   }
 
   function update() {
-    var types    = checkedValues('type');
+    var items    = composition();
+    var t        = totals();
     var rendu    = checked('rendu');
     var scan     = checked('scan');
     var remise   = checked('remise');
     var paiement = checked('paiement');
-    var format   = formatSel.value;
-    var qty      = getQty();
 
-    var unit  = BASE_PRICE + (format === FORMAT_120_VALUE ? FORMAT_120_SURCHARGE : 0);
-    var total = unit * qty;
+    // Pellicules : liste multi-ligne dans le récap, ou "—" si vide
+    if (rPellicules) {
+      rPellicules.innerHTML = '';
+      if (items.length === 0) {
+        var span = document.createElement('span');
+        span.textContent = '—';
+        rPellicules.appendChild(span);
+      } else {
+        items.forEach(function (it) {
+          var s = document.createElement('span');
+          s.textContent = it.n + '× ' + it.type + ' ' + it.format;
+          rPellicules.appendChild(s);
+        });
+      }
+    }
 
-    set('r-format',   format);
-    set('r-qty',      qty + (qty > 1 ? ' pellicules' : ' pellicule'));
-    set('r-type',     types.join(' + ') || '—');
     set('r-rendu',    rendu ? rendu.value : '—');
     set('r-scan',     scan ? scan.value : '—');
     set('r-remise',   remise ? remise.value : '—');
     set('r-paiement', paiement ? paiement.value : '—');
-    set('r-unit',     unit + ' €');
-    set('r-total',    total + ' €');
+    set('r-qty',      t.qty + (t.qty > 1 ? ' pellicules' : ' pellicule'));
+    set('r-total',    t.price + ' €');
 
     if (returnNotice) returnNotice.hidden = !remise || remise.value !== 'Envoi postal';
+
+    // Empêche l'envoi si aucune pellicule sélectionnée
+    var empty = t.qty === 0;
+    if (submitBtn) submitBtn.disabled = empty;
+    if (emptyHint) emptyHint.hidden = !empty;
+  }
+
+  // Construit la chaîne lisible "1× N&B 35 mm + 1× Couleur 120" pour le mail
+  function compositionString() {
+    var items = composition();
+    if (items.length === 0) return '—';
+    return items.map(function (it) {
+      return it.n + '× ' + it.type + ' ' + it.format;
+    }).join(' + ');
   }
 
   // Référence virement type "JB-260601-X7K9".
@@ -122,26 +145,18 @@
     return 'JB-' + yy + mm + dd + '-' + rand;
   }
 
-  document.getElementById('plus').addEventListener('click', function () {
-    qtyInput.value = Math.min(99, (parseInt(qtyInput.value, 10) || 1) + 1);
-    syncTypeMode();
-    update();
-  });
-  document.getElementById('minus').addEventListener('click', function () {
-    qtyInput.value = Math.max(1, (parseInt(qtyInput.value, 10) || 1) - 1);
-    syncTypeMode();
+  // Délégation : tous les boutons +/- des 4 mini-steppers passent par là
+  form.addEventListener('click', function (e) {
+    var btn = e.target.closest('.stepper-btn');
+    if (!btn) return;
+    var target = btn.dataset.target;
+    var action = btn.dataset.action;
+    var cur = getCount(target);
+    setCount(target, action === 'inc' ? cur + 1 : cur - 1);
     update();
   });
 
-  form.addEventListener('change', function (e) {
-    // En mode checkbox, empêche de décocher la dernière case "type"
-    if (e.target && e.target.name === 'type' && e.target.type === 'checkbox' && !e.target.checked) {
-      if (form.querySelectorAll('input[name="type"]:checked').length === 0) {
-        e.target.checked = true;
-      }
-    }
-    update();
-  });
+  form.addEventListener('change', update);
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -149,6 +164,9 @@
 
     sentMsg.classList.remove('show');
     if (errMsg) errMsg.classList.remove('show');
+
+    var t = totals();
+    if (t.qty === 0) return; // garde-fou, normalement le bouton est disabled
 
     var paiement = checked('paiement');
     var isVirement = paiement && paiement.value === 'Virement';
@@ -159,21 +177,32 @@
     }
     if (virementBlock) virementBlock.hidden = !isVirement;
 
-    if (hPrixUnit) hPrixUnit.value = document.getElementById('r-unit').textContent;
-    if (hTotal)    hTotal.value    = document.getElementById('r-total').textContent;
-    if (hRef)      hRef.value      = isVirement ? ref : '(paiement en main propre)';
+    // Construction manuelle du FormData : on n'envoie pas les 4 compteurs
+    // bruts (qty_nb_35, etc.) qui seraient peu lisibles dans le mail, mais
+    // une composition agrégée et les totaux nommés
+    var fd = new FormData();
+    fd.append('_subject',  'Nouvelle demande de devis — Jarod Buisson');
+    fd.append('_template', 'table');
+    fd.append('_captcha',  'false');
+    var honey = form.querySelector('input[name="_honey"]');
+    if (honey) fd.append('_honey', honey.value);
 
-    // En multi-sélection, FormData renvoie plusieurs entries "type" — on les
-    // fusionne en une seule valeur jointe pour un mail plus lisible
-    var fd = new FormData(form);
-    var typesJoined = checkedValues('type').join(' + ');
-    fd.delete('type');
-    fd.append('type', typesJoined);
+    fd.append('composition',        compositionString());
+    fd.append('quantite_totale',    String(t.qty));
+    fd.append('prix_total',         t.price + ' €');
+    fd.append('rendu',              checked('rendu').value);
+    fd.append('scan',               checked('scan').value);
+    fd.append('remise',             checked('remise').value);
+    fd.append('paiement',           paiement.value);
+    fd.append('reference_virement', isVirement ? ref : '(paiement en main propre)');
+    fd.append('nom',                document.getElementById('name').value);
+    fd.append('email',              document.getElementById('email').value);
+    fd.append('details',            document.getElementById('msg').value);
 
     var origLabel = submitBtn ? submitBtn.textContent : '';
     if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Envoi…'; }
 
-    fetch(form.action, {
+    fetch(FORMSUBMIT_ENDPOINT, {
       method: 'POST',
       body: fd,
       headers: { 'Accept': 'application/json' }
@@ -193,12 +222,11 @@
     })
     .finally(function () {
       if (submitBtn) {
-        submitBtn.disabled = false;
+        submitBtn.disabled = totals().qty === 0;
         submitBtn.textContent = origLabel || 'Envoyer ma demande →';
       }
     });
   });
 
-  syncTypeMode();
   update();
 })();
