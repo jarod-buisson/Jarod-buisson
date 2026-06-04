@@ -40,7 +40,8 @@
   <header class="subhero">
     <div class="wrap">
       <p class="eyebrow">Services</p>
-      <h1>Développement + Numérisation</h1>
+      <h1>Développement &amp; Numérisation</h1>
+      <p class="lead" style="font-size:16px;max-width:760px;line-height:1.6;margin:0 0 6px">Les développements N&amp;B sont réalisés au Kodak D-76 et les couleurs au CineStill Cs41.<br>La numérisation 35 mm sort à la résolution 6000×4000 px.<br>Les scans seront envoyés via un lien SwissTransfer.</p>
       <div class="price-badge">
         <span class="pb-dot"></span>
         <b>10 €</b>
@@ -137,9 +138,28 @@
             </div>
           </div>
 
-          <!-- 3 · TYPE DE REMISE -->
+          <!-- 3 · FORMAT DE FICHIER -->
           <div class="opt-group">
-            <div class="glabel"><span class="step-no">03</span> Type de remise</div>
+            <div class="glabel"><span class="step-no">03</span> Format de fichier</div>
+            <div class="opts">
+              <label class="opt">
+                <input type="radio" name="format" value="JPG" checked>
+                <span class="swatch sw-classic"></span>
+                <span class="t">JPG</span>
+                <span class="tick">✓</span><span class="pick-border"></span>
+              </label>
+              <label class="opt">
+                <input type="radio" name="format" value="TIFF">
+                <span class="swatch sw-contrast"></span>
+                <span class="t">TIFF</span>
+                <span class="tick">✓</span><span class="pick-border"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- 4 · TYPE DE REMISE -->
+          <div class="opt-group">
+            <div class="glabel"><span class="step-no">04</span> Type de remise</div>
             <div class="opts">
               <label class="opt">
                 <input type="radio" name="remise" value="En main propre" checked>
@@ -162,7 +182,7 @@
 
           <!-- 4 · PAIEMENT -->
           <div class="opt-group">
-            <div class="glabel"><span class="step-no">04</span> Paiement</div>
+            <div class="glabel"><span class="step-no">05</span> Paiement</div>
             <div class="pay-panel">
               <p class="pay-intro">Merci d'effectuer le règlement avant la remise ou l'envoi de vos films. Si vous souhaitez régler en espèce, merci de le préciser dans les détails et de le faire lors de la remise de vos pellicules.</p>
               <div class="pay-ref">
@@ -175,7 +195,7 @@
 
           <!-- 5 · COORDONNÉES -->
           <div class="opt-group">
-            <div class="glabel"><span class="step-no">05</span> Coordonnées</div>
+            <div class="glabel"><span class="step-no">06</span> Coordonnées</div>
             <div class="row2">
               <div class="field">
                 <label for="name">Nom</label>
@@ -208,6 +228,7 @@
               <div class="rv" id="r-pellicules"><span>1× N&amp;B</span></div>
             </div>
             <div class="recap-row"><span class="rk">Rendu</span><span class="rv" id="r-rendu">Classique</span></div>
+            <div class="recap-row"><span class="rk">Format</span><span class="rv" id="r-format">JPG</span></div>
             <div class="recap-row"><span class="rk">Remise</span><span class="rv" id="r-remise">En main propre</span></div>
             <div class="recap-row"><span class="rk">Paiement</span><span class="rv" id="r-paiement">En main propre</span></div>
             <div class="recap-row"><span class="rk">Quantité totale</span><span class="rv" id="r-qty">1 pellicule</span></div>

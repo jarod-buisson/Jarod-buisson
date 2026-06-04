@@ -103,6 +103,7 @@
     var items    = composition();
     var t        = totals();
     var rendu    = checked('rendu');
+    var format   = checked('format');
     var remise   = checked('remise');
 
     // Pellicules : liste multi-ligne dans le récap, ou "—" si vide
@@ -122,6 +123,7 @@
     }
 
     set('r-rendu',    rendu ? rendu.value : '—');
+    set('r-format',   format ? format.value : '—');
     set('r-remise',   remise ? remise.value : '—');
     set('r-paiement', 'Virement · réf. ' + PAY_REF);
     set('r-qty',      t.qty + (t.qty > 1 ? ' pellicules' : ' pellicule'));
@@ -190,6 +192,7 @@
     fd.append('quantite_totale',     String(t.qty));
     fd.append('prix_total',          t.price + ' €');
     fd.append('rendu',               checked('rendu').value);
+    fd.append('format',              checked('format').value);
     fd.append('remise',              checked('remise').value);
     fd.append('paiement',            'Virement (PayPal ou Wero)');
     fd.append('reference_paiement',  PAY_REF);
@@ -207,6 +210,7 @@
         composition: compositionString(),
         quantite:    String(t.qty),
         rendu:       checked('rendu').value,
+        format:      checked('format').value,
         remise:      checked('remise').value,
         paiement:    'Virement (PayPal ou Wero)',
         prix_total:  t.price + ' €',
