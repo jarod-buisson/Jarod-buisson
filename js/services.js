@@ -27,6 +27,13 @@
   var PRICE_120  = 12;
   var FORMSUBMIT_ENDPOINT = form.action;
 
+  // EmailJS : mail de confirmation au client (FormSubmit gère le mail admin).
+  // La clé publique est destinée à être exposée côté navigateur.
+  var EMAILJS_SERVICE_ID  = 'service_0s2j1cg';
+  var EMAILJS_TEMPLATE_ID = 'template_w30pet5';
+  var EMAILJS_PUBLIC_KEY  = 'oS00khejCHT2v4Hhy';
+  if (window.emailjs) emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+
   // Aperçu photo par rendu. Noms de fichiers en ASCII minuscule : GitHub
   // Pages tourne sous Linux (sensible à la casse) et n'aime pas les accents.
   var RENDU_PREVIEW = {
@@ -192,9 +199,6 @@
     fd.append('_subject',  'Demande de développement — Jarod Buisson');
     fd.append('_template', 'table');
     fd.append('_captcha',  'false');
-    // Copie envoyée au client : il reçoit le même récap (avec sa référence
-    // de paiement). _cc fonctionne en AJAX, contrairement à _autoresponse.
-    fd.append('_cc',       document.getElementById('email').value);
     var honey = form.querySelector('input[name="_honey"]');
     if (honey) fd.append('_honey', honey.value);
 
@@ -209,6 +213,26 @@
     fd.append('nom',                 document.getElementById('name').value);
     fd.append('email',               document.getElementById('email').value);
     fd.append('details',             document.getElementById('msg').value);
+
+    // Mail de confirmation au client via EmailJS (indépendant du mail admin
+    // FormSubmit) : en cas d'échec on n'interrompt pas — Jarod a la demande.
+    if (window.emailjs) {
+      emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+        email:       document.getElementById('email').value,
+        nom:         document.getElementById('name').value,
+        composition: compositionString(),
+        quantite:    String(t.qty),
+        rendu:       checked('rendu').value,
+        scan:        checked('scan').value,
+        remise:      checked('remise').value,
+        paiement:    'Virement (PayPal ou Wero)',
+        prix_total:  t.price + ' €',
+        reference:   PAY_REF,
+        details:     document.getElementById('msg').value || '—'
+      }).catch(function (err) {
+        console.warn('EmailJS (mail client) a échoué :', err);
+      });
+    }
 
     var origLabel = submitBtn ? submitBtn.textContent : '';
     if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Envoi…'; }
