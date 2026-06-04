@@ -238,19 +238,26 @@ section { position: relative; }
 .frame::after  { bottom: 0; }
 .frame .shot {
   margin: 4px 12px;
-  aspect-ratio: 3/2;
   border-radius: 2px;
   position: relative;
   overflow: hidden;
 }
+.frame .shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 2px;
+}
 .frame .label {
-  position: absolute; top: 16px; left: 22px;
+  position: absolute; top: 18px; left: 24px;
   font-family: var(--mono); font-size: 10px; letter-spacing: .12em;
-  color: rgba(224,164,88,.85); z-index: 2; text-transform: uppercase;
+  color: rgba(255,212,156,.95); z-index: 2; text-transform: uppercase;
+  text-shadow: 0 1px 4px rgba(0,0,0,.75);
 }
 .frame .num {
-  position: absolute; bottom: 16px; right: 22px;
-  font-family: var(--mono); font-size: 10px; color: rgba(244,239,231,.5); z-index: 2;
+  position: absolute; bottom: 18px; right: 24px;
+  font-family: var(--mono); font-size: 10px; color: rgba(244,239,231,.92); z-index: 2;
+  text-shadow: 0 1px 4px rgba(0,0,0,.75);
 }
 
 /* duotones évoquant la pellicule */
@@ -262,15 +269,15 @@ section { position: relative; }
 .f-sepia  { background: linear-gradient(135deg, #241910, #7a5a38 55%, #d8b888); }
 
 .gallery {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 22px;
+  column-count: 3;
+  column-gap: 22px;
 }
-.gallery .frame { transition: transform .4s ease, box-shadow .4s ease; }
+.gallery .frame {
+  break-inside: avoid;
+  margin: 0 0 22px;
+  transition: transform .4s ease, box-shadow .4s ease;
+}
 .gallery .frame:hover { transform: translateY(-6px); box-shadow: 0 24px 50px rgba(0,0,0,.45); }
-.span-7 { grid-column: span 7; } .span-5 { grid-column: span 5; }
-.span-6 { grid-column: span 6; } .span-4 { grid-column: span 4; }
-.span-8 { grid-column: span 8; } .span-12 { grid-column: span 12; }
 
 /* Projets / séries — liste éditoriale */
 .series { border-top: 1px solid var(--line); }
@@ -627,7 +634,7 @@ section { position: relative; }
   .about, .config { grid-template-columns: 1fr; gap: 40px; }
   .steps, .howto { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; gap: 30px; }
-  .gallery > * { grid-column: span 12 !important; }
+  .gallery { column-count: 2; }
   .opts.three { grid-template-columns: 1fr; }
   .pellicules { grid-template-columns: 1fr; }
   .recap { position: static; }
@@ -636,6 +643,7 @@ section { position: relative; }
 @media (max-width: 560px) {
   body { font-size: 16px; }
   .section { padding: 80px 0; }
+  .gallery { column-count: 1; }
   .opts { grid-template-columns: 1fr; }
   .row2 { grid-template-columns: 1fr; }
   .stats { flex-wrap: wrap; gap: 24px; }

@@ -1,0 +1,7 @@
+# Photos sources lourdes (TIFF/PNG/JPG plein format, ~700 Mo) — non destinées
+# au web. Seules les versions optimisées de images/gallery/ sont publiées.
+images/acueil/
+
+# Divers
+.DS_Store
+Thumbs.db
