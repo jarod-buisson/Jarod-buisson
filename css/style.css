@@ -375,6 +375,10 @@ section { position: relative; }
 }
 
 .config { display: grid; grid-template-columns: 1.7fr 1fr; gap: 50px; align-items: start; }
+/* L'aside doit s'étirer sur toute la hauteur du formulaire, sinon il ne
+   fait que la hauteur du récap et celui-ci n'a aucune marge pour rester
+   collé (position:sticky) pendant le défilement. */
+.config > aside { align-self: stretch; }
 
 .opt-group { margin-bottom: 44px; }
 .opt-group > .glabel {
