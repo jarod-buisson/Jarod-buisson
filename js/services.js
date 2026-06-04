@@ -207,6 +207,24 @@
     fd.append('email',               document.getElementById('email').value);
     fd.append('details',             document.getElementById('msg').value);
 
+    // Copie de confirmation envoyée automatiquement au client (FormSubmit
+    // _autoresponse) : récap de sa commande + sa référence de paiement.
+    fd.append('_autoresponse',
+      'Bonjour ' + document.getElementById('name').value + ',\n\n' +
+      'Merci pour votre demande ! Voici le récapitulatif de votre commande :\n\n' +
+      '- Pellicules : ' + compositionString() + '\n' +
+      '- Quantité totale : ' + t.qty + '\n' +
+      '- Rendu : ' + checked('rendu').value + '\n' +
+      '- Numérisation : ' + checked('scan').value + '\n' +
+      '- Remise : ' + checked('remise').value + '\n' +
+      '- Paiement : virement (PayPal ou Wero)\n' +
+      '- Total estimé : ' + t.price + ' €\n\n' +
+      'Votre référence de paiement : ' + PAY_REF + '\n' +
+      '(à indiquer dans la description de votre virement)\n\n' +
+      'Je reviens vers vous rapidement avec les coordonnées de paiement (PayPal / Wero) ' +
+      'et l\'adresse d\'envoi de vos pellicules.\n\n' +
+      '— Jarod Buisson');
+
     var origLabel = submitBtn ? submitBtn.textContent : '';
     if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Envoi…'; }
 
