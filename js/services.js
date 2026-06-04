@@ -29,7 +29,7 @@
 
   // EmailJS : mail de confirmation au client (FormSubmit gère le mail admin).
   // La clé publique est destinée à être exposée côté navigateur.
-  var EMAILJS_SERVICE_ID  = 'service_0s2j1cg';
+  var EMAILJS_SERVICE_ID  = 'service_joq5dag';
   var EMAILJS_TEMPLATE_ID = 'template_w30pet5';
   var EMAILJS_PUBLIC_KEY  = 'oS00khejCHT2v4Hhy';
   if (window.emailjs) emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
