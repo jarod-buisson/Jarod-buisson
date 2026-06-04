@@ -1,30 +1,24 @@
 /* Configurateur de la page Services.
 
-   Modèle « panier » : l'utilisateur compose sa commande en incrémentant
-   les compteurs des cartes Noir & Blanc et Couleur, chacune offrant deux
-   formats (35 mm et 120). Le total quantité + prix se calculent en direct.
+   Modèle « panier » : l'utilisateur compose sa commande en incrémentant le
+   compteur des cartes Noir & Blanc et Couleur. Tarif unique : 10 € la
+   pellicule, quel que soit le format (35 mm ou 120) ou le rendu —
+   développement et scan toujours inclus.
 
-   Tarification :
-   - 35 mm : 10 € par pellicule (N&B ou Couleur)
-   - 120   : 12 € par pellicule (N&B ou Couleur)
-   Le rendu, le scan et la remise n'ont pas d'incidence sur le prix —
-   ce sont des préférences de traitement.
+   Paiement : avant la remise/l'envoi, par virement (PayPal ou Wero) ou en
+   espèces lors de la remise. Une référence à 6 caractères est générée à
+   chaque chargement de page ; le client la reporte lors de son règlement
+   pour qu'on puisse rattacher le paiement à sa commande.
 
-   Paiement : exclusivement par virement (PayPal ou Wero). Une référence
-   à 6 caractères est générée à chaque chargement de la page ; le client
-   doit la reporter dans la description de son virement pour qu'on puisse
-   rattacher le paiement à sa commande.
-
-   Envoi : AJAX POST vers FormSubmit. On construit FormData manuellement
-   pour que le mail soit lisible (composition agrégée, totaux nommés)
-   plutôt qu'une liste des 4 compteurs bruts. Si l'envoi échoue, message
-   fallback qui invite à m'écrire en direct. */
+   Envoi :
+   - FormData POST AJAX vers FormSubmit → mail de notification (admin).
+   - EmailJS → mail de confirmation au client (récap + référence).
+   Si un envoi échoue, on n'interrompt pas l'autre. */
 (function () {
   var form = document.getElementById('configForm');
   if (!form) return;
 
-  var PRICE_35   = 10;
-  var PRICE_120  = 12;
+  var UNIT_PRICE = 10;            // 10 € la pellicule, tout format / tout rendu
   var FORMSUBMIT_ENDPOINT = form.action;
 
   // EmailJS : mail de confirmation au client (FormSubmit gère le mail admin).
@@ -42,12 +36,10 @@
     'Flat':      'images/flat.jpg'
   };
 
-  // 4 compteurs (type × format) + leurs métadonnées pour la composition lisible
+  // Un compteur par type de pellicule
   var COUNTERS = [
-    { id: 'qty_nb_35',  type: 'N&B',     format: '35 mm', price: PRICE_35  },
-    { id: 'qty_nb_120', type: 'N&B',     format: '120',   price: PRICE_120 },
-    { id: 'qty_col_35', type: 'Couleur', format: '35 mm', price: PRICE_35  },
-    { id: 'qty_col_120',type: 'Couleur', format: '120',   price: PRICE_120 }
+    { id: 'qty_nb',  type: 'N&B' },
+    { id: 'qty_col', type: 'Couleur' }
   ];
 
   var returnNotice  = document.getElementById('returnNotice');
@@ -96,27 +88,21 @@
     var items = [];
     COUNTERS.forEach(function (c) {
       var n = getCount(c.id);
-      if (n > 0) items.push({ n: n, type: c.type, format: c.format, price: c.price });
+      if (n > 0) items.push({ n: n, type: c.type });
     });
     return items;
   }
 
   function totals() {
     var qty = 0;
-    var price = 0;
-    COUNTERS.forEach(function (c) {
-      var n = getCount(c.id);
-      qty += n;
-      price += n * c.price;
-    });
-    return { qty: qty, price: price };
+    COUNTERS.forEach(function (c) { qty += getCount(c.id); });
+    return { qty: qty, price: qty * UNIT_PRICE };
   }
 
   function update() {
     var items    = composition();
     var t        = totals();
     var rendu    = checked('rendu');
-    var scan     = checked('scan');
     var remise   = checked('remise');
 
     // Pellicules : liste multi-ligne dans le récap, ou "—" si vide
@@ -129,14 +115,13 @@
       } else {
         items.forEach(function (it) {
           var s = document.createElement('span');
-          s.textContent = it.n + '× ' + it.type + ' ' + it.format;
+          s.textContent = it.n + '× ' + it.type;
           rPellicules.appendChild(s);
         });
       }
     }
 
     set('r-rendu',    rendu ? rendu.value : '—');
-    set('r-scan',     scan ? scan.value : '—');
     set('r-remise',   remise ? remise.value : '—');
     set('r-paiement', 'Virement · réf. ' + PAY_REF);
     set('r-qty',      t.qty + (t.qty > 1 ? ' pellicules' : ' pellicule'));
@@ -160,16 +145,16 @@
     if (emptyHint) emptyHint.hidden = !empty;
   }
 
-  // Construit la chaîne lisible "1× N&B 35 mm + 1× Couleur 120" pour le mail
+  // Construit la chaîne lisible "1× N&B + 2× Couleur" pour les mails
   function compositionString() {
     var items = composition();
     if (items.length === 0) return '—';
     return items.map(function (it) {
-      return it.n + '× ' + it.type + ' ' + it.format;
+      return it.n + '× ' + it.type;
     }).join(' + ');
   }
 
-  // Délégation : tous les boutons +/- des 4 mini-steppers passent par là
+  // Délégation : tous les boutons +/- des mini-steppers passent par là
   form.addEventListener('click', function (e) {
     var btn = e.target.closest('.stepper-btn');
     if (!btn) return;
@@ -192,9 +177,8 @@
     var t = totals();
     if (t.qty === 0) return; // garde-fou, normalement le bouton est disabled
 
-    // Construction manuelle du FormData : on n'envoie pas les 4 compteurs
-    // bruts (qty_nb_35, etc.) qui seraient peu lisibles dans le mail, mais
-    // une composition agrégée et les totaux nommés
+    // Construction manuelle du FormData : on n'envoie pas les compteurs bruts
+    // (qty_nb, qty_col) mais une composition agrégée et les totaux nommés
     var fd = new FormData();
     fd.append('_subject',  'Demande de développement — Jarod Buisson');
     fd.append('_template', 'table');
@@ -206,7 +190,6 @@
     fd.append('quantite_totale',     String(t.qty));
     fd.append('prix_total',          t.price + ' €');
     fd.append('rendu',               checked('rendu').value);
-    fd.append('scan',                checked('scan').value);
     fd.append('remise',              checked('remise').value);
     fd.append('paiement',            'Virement (PayPal ou Wero)');
     fd.append('reference_paiement',  PAY_REF);
@@ -223,7 +206,6 @@
         composition: compositionString(),
         quantite:    String(t.qty),
         rendu:       checked('rendu').value,
-        scan:        checked('scan').value,
         remise:      checked('remise').value,
         paiement:    'Virement (PayPal ou Wero)',
         prix_total:  t.price + ' €',

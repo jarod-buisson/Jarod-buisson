@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Services — Développement & scan de vos pellicules</title>
-  <meta name="description" content="Tarif unique 10 € la pellicule, dev + scan inclus (12 € en 120). Configurez votre commande : N&B ou couleur, rendu classique, contrasté ou flat. Développement de pellicules par un photographe argentique.">
+  <meta name="description" content="Tarif unique 10 € la pellicule, développement + scan inclus. Configurez votre commande : N&B ou couleur, rendu classique, contrasté ou flat. Développement de pellicules par un photographe argentique.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,500&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -42,7 +42,7 @@
       <div class="price-badge">
         <span class="pb-dot"></span>
         <b>10 €</b>
-        <span>la pellicule · dev + scan inclus · <em>+ 2 €</em> en moyen format</span>
+        <span>la pellicule · développement + scan inclus</span>
       </div>
     </div>
   </header>
@@ -61,33 +61,21 @@
 
         <!-- Colonne choix -->
         <div>
-          <!-- 1 · VOS PELLICULES (type + format + quantité combinés) -->
+          <!-- 1 · VOS PELLICULES -->
           <div class="opt-group">
             <div class="glabel"><span class="step-no">01</span> Vos pellicules</div>
-            <div class="glabel-hint">
-              Indiquez la quantité par type et par format. Vous pouvez mélanger N&amp;B et Couleur, 35 mm et 120 dans une même commande.
-            </div>
             <div class="pellicules">
 
               <div class="pellicule-card">
                 <span class="swatch sw-bw"></span>
                 <h4 class="pc-title">Noir &amp; Blanc</h4>
-                <p class="pc-desc">Développement N&amp;B à la main.</p>
                 <div class="pc-formats">
                   <div class="pc-format-row">
-                    <span class="pc-fmt">35 mm</span>
+                    <span class="pc-fmt">Quantité</span>
                     <div class="stepper stepper-sm">
-                      <button type="button" class="stepper-btn" data-action="dec" data-target="qty_nb_35" aria-label="moins">−</button>
-                      <input type="number" id="qty_nb_35" name="qty_nb_35" value="1" min="0" max="99" readonly>
-                      <button type="button" class="stepper-btn" data-action="inc" data-target="qty_nb_35" aria-label="plus">+</button>
-                    </div>
-                  </div>
-                  <div class="pc-format-row">
-                    <span class="pc-fmt">120</span>
-                    <div class="stepper stepper-sm">
-                      <button type="button" class="stepper-btn" data-action="dec" data-target="qty_nb_120" aria-label="moins">−</button>
-                      <input type="number" id="qty_nb_120" name="qty_nb_120" value="0" min="0" max="99" readonly>
-                      <button type="button" class="stepper-btn" data-action="inc" data-target="qty_nb_120" aria-label="plus">+</button>
+                      <button type="button" class="stepper-btn" data-action="dec" data-target="qty_nb" aria-label="moins">−</button>
+                      <input type="number" id="qty_nb" name="qty_nb" value="1" min="0" max="99" readonly>
+                      <button type="button" class="stepper-btn" data-action="inc" data-target="qty_nb" aria-label="plus">+</button>
                     </div>
                   </div>
                 </div>
@@ -96,22 +84,13 @@
               <div class="pellicule-card">
                 <span class="swatch sw-color"></span>
                 <h4 class="pc-title">Couleur</h4>
-                <p class="pc-desc">Procédé C-41 (négatif couleur).</p>
                 <div class="pc-formats">
                   <div class="pc-format-row">
-                    <span class="pc-fmt">35 mm</span>
+                    <span class="pc-fmt">Quantité</span>
                     <div class="stepper stepper-sm">
-                      <button type="button" class="stepper-btn" data-action="dec" data-target="qty_col_35" aria-label="moins">−</button>
-                      <input type="number" id="qty_col_35" name="qty_col_35" value="0" min="0" max="99" readonly>
-                      <button type="button" class="stepper-btn" data-action="inc" data-target="qty_col_35" aria-label="plus">+</button>
-                    </div>
-                  </div>
-                  <div class="pc-format-row">
-                    <span class="pc-fmt">120</span>
-                    <div class="stepper stepper-sm">
-                      <button type="button" class="stepper-btn" data-action="dec" data-target="qty_col_120" aria-label="moins">−</button>
-                      <input type="number" id="qty_col_120" name="qty_col_120" value="0" min="0" max="99" readonly>
-                      <button type="button" class="stepper-btn" data-action="inc" data-target="qty_col_120" aria-label="plus">+</button>
+                      <button type="button" class="stepper-btn" data-action="dec" data-target="qty_col" aria-label="moins">−</button>
+                      <input type="number" id="qty_col" name="qty_col" value="0" min="0" max="99" readonly>
+                      <button type="button" class="stepper-btn" data-action="inc" data-target="qty_col" aria-label="plus">+</button>
                     </div>
                   </div>
                 </div>
@@ -153,30 +132,9 @@
             </figure>
           </div>
 
-          <!-- 3 · SCAN -->
+          <!-- 3 · TYPE DE REMISE -->
           <div class="opt-group">
-            <div class="glabel"><span class="step-no">03</span> Numérisation</div>
-            <div class="opts">
-              <label class="opt">
-                <input type="radio" name="scan" value="Avec scan HD" checked>
-                <span class="swatch sw-color"></span>
-                <span class="t">Avec scan</span>
-                <span class="d">Scans haute définition + retour des négatifs.</span>
-                <span class="tick">✓</span><span class="pick-border"></span>
-              </label>
-              <label class="opt">
-                <input type="radio" name="scan" value="Sans scan">
-                <span class="swatch sw-bw"></span>
-                <span class="t">Sans scan</span>
-                <span class="d">Développement seul, retour des négatifs.</span>
-                <span class="tick">✓</span><span class="pick-border"></span>
-              </label>
-            </div>
-          </div>
-
-          <!-- 4 · TYPE DE REMISE -->
-          <div class="opt-group">
-            <div class="glabel"><span class="step-no">04</span> Type de remise</div>
+            <div class="glabel"><span class="step-no">03</span> Type de remise</div>
             <div class="opts">
               <label class="opt">
                 <input type="radio" name="remise" value="En main propre" checked>
@@ -199,22 +157,22 @@
             </div>
           </div>
 
-          <!-- 5 · PAIEMENT -->
+          <!-- 4 · PAIEMENT -->
           <div class="opt-group">
-            <div class="glabel"><span class="step-no">05</span> Paiement</div>
+            <div class="glabel"><span class="step-no">04</span> Paiement</div>
             <div class="pay-panel">
-              <p class="pay-intro">Réglement par <b>virement</b>, via <b>PayPal</b> ou <b>Wero</b>. Pour que je rattache votre paiement à votre commande, indiquez la référence ci-dessous dans la description de votre virement.</p>
+              <p class="pay-intro">Merci d'effectuer le règlement avant la remise ou l'envoi de vos films. Si vous souhaitez régler en espèce, merci de le préciser dans les détails et de le faire lors de la remise de vos pellicules.</p>
               <div class="pay-ref">
                 <span class="pr-label">Votre référence de paiement</span>
                 <code class="pr-code" id="payCode">——————</code>
               </div>
-              <p class="pay-note">Les coordonnées PayPal / Wero vous sont transmises par email avec la confirmation du devis.</p>
+              <p class="pay-note">Les coordonnées de paiement (PayPal / Wero) figurent dans l'email de confirmation que vous recevez juste après l'envoi de votre demande.</p>
             </div>
           </div>
 
-          <!-- 6 · COORDONNÉES -->
+          <!-- 5 · COORDONNÉES -->
           <div class="opt-group">
-            <div class="glabel"><span class="step-no">06</span> Coordonnées</div>
+            <div class="glabel"><span class="step-no">05</span> Coordonnées</div>
             <div class="row2">
               <div class="field">
                 <label for="name">Nom</label>
@@ -226,7 +184,7 @@
               </div>
             </div>
             <div class="field">
-              <label for="msg">Détails (sensibilité, push/pull, demandes…)</label>
+              <label for="msg">Détails (sensibilité, push/pull, règlement en espèce…)</label>
               <textarea id="msg" name="msg" placeholder="Ex : 2× HP5 poussée à 1600, 1× Portra 400 nominal…"></textarea>
             </div>
           </div>
@@ -240,10 +198,9 @@
 
             <div class="recap-row recap-row-stack">
               <span class="rk">Pellicules</span>
-              <div class="rv" id="r-pellicules"><span>1× N&amp;B 35 mm</span></div>
+              <div class="rv" id="r-pellicules"><span>1× N&amp;B</span></div>
             </div>
             <div class="recap-row"><span class="rk">Rendu</span><span class="rv" id="r-rendu">Classique</span></div>
-            <div class="recap-row"><span class="rk">Scan</span><span class="rv" id="r-scan">Avec scan HD</span></div>
             <div class="recap-row"><span class="rk">Remise</span><span class="rv" id="r-remise">En main propre</span></div>
             <div class="recap-row"><span class="rk">Paiement</span><span class="rv" id="r-paiement">En main propre</span></div>
             <div class="recap-row"><span class="rk">Quantité totale</span><span class="rv" id="r-qty">1 pellicule</span></div>
@@ -254,14 +211,14 @@
             </div>
 
             <button type="submit" class="btn" id="submitBtn">Envoyer ma demande →</button>
-            <p class="note">10 € la pellicule en 35 mm, 12 € en 120 — développement et scan inclus, peu importe le rendu choisi. Le devis est confirmé par email avant tout envoi de vos films.</p>
+            <p class="note">10 € la pellicule, développement et scan inclus, quel que soit le format ou le rendu. Le devis est confirmé par email avant tout envoi de vos films.</p>
 
             <div class="sent" id="sentMsg">
               <div class="sent-line">
                 ✅ Demande envoyée&nbsp;! Je vous réponds par email sous 24 à 48&nbsp;h.
               </div>
               <div class="virement-block" id="virementBlock">
-                <p class="vb-label">Référence à indiquer dans la description du virement</p>
+                <p class="vb-label">Référence à indiquer lors de votre règlement</p>
                 <code class="virement-code" id="virementCode">——————</code>
               </div>
             </div>
