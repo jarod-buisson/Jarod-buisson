@@ -126,10 +126,16 @@
                 <span class="tick">✓</span><span class="pick-border"></span>
               </label>
             </div>
-            <figure class="rendu-preview">
-              <img id="renduPreview" src="images/classique.jpg" alt="Aperçu du rendu Classique" loading="lazy" decoding="async">
-              <figcaption><span class="rp-dot"></span> Aperçu — le rendu sélectionné s'affiche ici.</figcaption>
-            </figure>
+            <div class="rendu-preview">
+              <button type="button" class="rendu-toggle" id="renduToggle" aria-expanded="false" aria-controls="renduPanel">
+                <span class="rp-dot"></span>
+                <span class="rt-label">Voir un aperçu du rendu</span>
+                <span class="rt-chev" aria-hidden="true">⌄</span>
+              </button>
+              <figure class="rendu-panel" id="renduPanel" hidden>
+                <img id="renduPreview" src="images/classique.jpg" alt="Aperçu du rendu Classique" loading="lazy" decoding="async">
+              </figure>
+            </div>
           </div>
 
           <!-- 3 · TYPE DE REMISE -->

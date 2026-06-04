@@ -245,6 +245,19 @@
     });
   });
 
+  // Aperçu du rendu : bouton déplier / replier (masqué par défaut)
+  var renduToggle = document.getElementById('renduToggle');
+  var renduPanel  = document.getElementById('renduPanel');
+  if (renduToggle && renduPanel) {
+    var rtLabel = renduToggle.querySelector('.rt-label');
+    renduToggle.addEventListener('click', function () {
+      var open = renduToggle.getAttribute('aria-expanded') === 'true';
+      renduToggle.setAttribute('aria-expanded', String(!open));
+      renduPanel.hidden = open;
+      if (rtLabel) rtLabel.textContent = open ? 'Voir un aperçu du rendu' : 'Masquer l\'aperçu';
+    });
+  }
+
   // Init : affiche la référence de paiement partout où elle apparaît
   if (payCode) payCode.textContent = PAY_REF;
   if (virementCode) virementCode.textContent = PAY_REF;
