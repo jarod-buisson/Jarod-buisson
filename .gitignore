@@ -1,6 +1,9 @@
-# Photos sources lourdes (TIFF/PNG/JPG plein format, ~700 Mo) — non destinées
-# au web. Seules les versions optimisées de images/gallery/ sont publiées.
+# Photos sources lourdes (TIFF/PNG/JPG plein format) — non destinées au web.
+# Seules les versions optimisées (images/gallery, images/series, images/large,
+# images/about-jarod.jpg) sont publiées.
 images/acueil/
+images/jarod.jpg
+images/euskal herria/
 
 # Divers
 .DS_Store
