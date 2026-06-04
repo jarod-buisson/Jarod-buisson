@@ -38,7 +38,10 @@ body {
   font-size: 17px;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  /* clip (et non hidden) : bloque le scroll horizontal SANS créer de
+     conteneur de défilement — sinon position:sticky (récap de la page
+     Services) ne fonctionne plus. */
+  overflow-x: clip;
 }
 
 /* Grain de pellicule sur toute la page ---------------------------------- */

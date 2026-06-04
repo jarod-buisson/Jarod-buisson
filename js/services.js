@@ -195,6 +195,7 @@
     fd.append('reference_paiement',  PAY_REF);
     fd.append('nom',                 document.getElementById('name').value);
     fd.append('email',               document.getElementById('email').value);
+    fd.append('instagram',           document.getElementById('instagram').value || '—');
     fd.append('details',             document.getElementById('msg').value);
 
     // Mail de confirmation au client via EmailJS (indépendant du mail admin
